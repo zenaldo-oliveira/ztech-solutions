@@ -1,12 +1,39 @@
 "use client";
 
 import { useState } from "react";
-import { Send } from "lucide-react";
+import { MessageCircle, Send } from "lucide-react";
+import { buildWhatsAppUrl } from "@/lib/contact/whatsapp";
 import { useTranslations } from "@/lib/i18n/LanguageContext";
 
 type SubmitStatus = "idle" | "submitting" | "success" | "error";
 
-const WHATSAPP_NUMBER = "5565992832422";
+type ContactData = {
+  name: string;
+  whatsapp: string;
+  email: string;
+  message: string;
+};
+
+// Mensagem enviada ao WhatsApp da MyCod com os dados do formulário — usada
+// depois de registrar o contato e, se o registro falhar, como alternativa.
+function buildContactWhatsAppUrl({ name, whatsapp, email, message }: ContactData): string {
+  const text = `
+
+
+🚀 Novo contato pelo site da MyCod
+
+👤 Nome: ${name}
+
+📱 WhatsApp: ${whatsapp}
+
+📧 E-mail: ${email}
+
+💬 Mensagem:
+${message}
+`;
+
+  return buildWhatsAppUrl(text);
+}
 
 export function ContactForm() {
   const t = useTranslations();
@@ -16,6 +43,7 @@ export function ContactForm() {
   const [message, setMessage] = useState("");
   const [status, setStatus] = useState<SubmitStatus>("idle");
   const [errorMessage, setErrorMessage] = useState("");
+  const [whatsappUrl, setWhatsappUrl] = useState<string | null>(null);
 
   const isSubmitting = status === "submitting";
 
@@ -27,6 +55,7 @@ export function ContactForm() {
 
     setStatus("submitting");
     setErrorMessage("");
+    setWhatsappUrl(null);
 
     try {
       const response = await fetch("/api/leads", {
@@ -51,32 +80,20 @@ export function ContactForm() {
 
       setStatus("success");
 
-      const text = `
+      const url = buildContactWhatsAppUrl({ name, whatsapp, email, message });
 
-
-🚀 Novo contato pelo Portfólio
-
-👤 Nome: ${name}
-
-📱 WhatsApp: ${whatsapp}
-
-📧 E-mail: ${email}
-
-💬 Mensagem:
-${message}
-`;
-
-      const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
-
-      window.open(url, "_blank");
+      // window.open depois de um await perde o gesto do usuário e é bloqueado
+      // no Safari iOS e nos navegadores internos do Instagram/Facebook. A
+      // tentativa automática fica só como conveniência (funciona em alguns
+      // desktops); o caminho garantido é o link exibido abaixo, que é um
+      // clique real do usuário.
+      setWhatsappUrl(url);
+      window.open(url, "_blank", "noopener,noreferrer");
 
       setName("");
       setWhatsapp("");
       setEmail("");
       setMessage("");
-
-      // Volta ao estado normal após a confirmação, liberando um novo envio.
-      setTimeout(() => setStatus("idle"), 4000);
     } catch {
       setStatus("error");
       setErrorMessage(t.contactForm.errorMessage);
@@ -104,9 +121,9 @@ ${message}
               text-text-primary
               outline-none
               transition-all
-              focus:border-cyan-500
+              focus:border-accent
               focus-visible:ring-2
-              focus-visible:ring-cyan-500/60
+              focus-visible:ring-ring
               disabled:opacity-60
             "
       />
@@ -130,9 +147,9 @@ ${message}
               text-text-primary
               outline-none
               transition-all
-              focus:border-cyan-500
+              focus:border-accent
               focus-visible:ring-2
-              focus-visible:ring-cyan-500/60
+              focus-visible:ring-ring
               disabled:opacity-60
             "
       />
@@ -156,7 +173,7 @@ ${message}
                 text-text-primary
                 outline-none
                 transition-all
-                focus:border-cyan-500
+                focus:border-accent
                 disabled:opacity-60
               "
       />
@@ -181,23 +198,67 @@ ${message}
               text-text-primary
               outline-none
               transition-all
-              focus:border-cyan-500
+              focus:border-accent
               focus-visible:ring-2
-              focus-visible:ring-cyan-500/60
+              focus-visible:ring-ring
               disabled:opacity-60
             "
       />
 
+      {/* Falha ao registrar: os campos continuam preenchidos e o visitante
+          pode enviar os mesmos dados pelo WhatsApp. Não afirma que o contato
+          foi salvo. */}
       {status === "error" && (
-        <p role="alert" className="text-sm text-red-400">
-          {errorMessage}
-        </p>
+        <div role="alert" className="space-y-3">
+          <p className="text-sm text-red-400">{errorMessage}</p>
+          <p className="text-sm text-text-secondary">{t.contactForm.errorWhatsappHint}</p>
+          <a
+            href={buildContactWhatsAppUrl({ name, whatsapp, email, message })}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex w-full items-center justify-center gap-2 rounded-xl border border-whatsapp/60 px-4 py-3 text-sm font-semibold text-text-primary transition-colors duration-200 hover:bg-whatsapp/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <MessageCircle size={16} aria-hidden="true" />
+            {t.contactForm.sendViaWhatsapp}
+          </a>
+        </div>
       )}
 
-      {status === "success" && (
-        <p role="status" className="text-sm text-emerald-400">
-          {t.contactForm.successMessage}
-        </p>
+      {status === "success" && whatsappUrl && (
+        <div role="status" className="space-y-3">
+          <p className="text-sm text-emerald-400">
+            {t.contactForm.successMessage}
+          </p>
+
+          <a
+            href={whatsappUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="
+              flex
+              w-full
+              items-center
+              justify-center
+              gap-2
+              rounded-xl
+              bg-whatsapp
+              px-4
+              py-3
+              text-sm
+              font-semibold
+              text-black
+              transition-all
+              duration-300
+              hover:scale-[1.01]
+              focus-visible:outline-none
+              focus-visible:ring-2
+              focus-visible:ring-ring
+            "
+          >
+            <MessageCircle size={16} />
+            {t.contactForm.openWhatsapp}
+          </a>
+        </div>
       )}
 
       <button
@@ -210,9 +271,8 @@ ${message}
             justify-center
             gap-2
             rounded-xl
-            bg-gradient-to-r
-            from-cyan-500
-            to-blue-600
+            bg-cta
+            hover:bg-cta-hover
             px-4
             py-3
             text-sm
@@ -223,7 +283,7 @@ ${message}
             hover:scale-[1.01]
             focus-visible:outline-none
             focus-visible:ring-2
-            focus-visible:ring-cyan-500/60
+            focus-visible:ring-ring
             disabled:cursor-not-allowed
             disabled:opacity-60
             disabled:hover:scale-100

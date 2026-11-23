@@ -1,50 +1,54 @@
-import { FloatingWhatsapp } from "@/components/floating-whatsapp";
-import { GlobalControls } from "@/components/layout/GlobalControls";
-import { Sidebar } from "@/components/layout/Sidebar";
+import { FloatingWhatsapp } from "@/components/layout/FloatingWhatsapp";
+import { AppShell } from "@/components/layout/AppShell";
+import { PageBackground } from "@/components/layout/PageBackground";
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import { LanguageProvider } from "@/lib/i18n/LanguageContext";
+import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
-// O Chat ZTech AI (components/AIAssistant.tsx, app/api/chat/route.ts) foi
-// removido da interface pública nesta etapa, mas mantido como código legado
-// — nenhuma página depende dele (confirmado via auditoria) e /api/leads,
-// ContactForm e a notificação continuam funcionando normalmente sem ele.
-// Reative importando e renderizando <AIAssistant /> novamente se necessário.
+// Executa antes do primeiro paint para evitar flash: aplica no <html> o tema
+// salvo (data-theme) e o estado recolhido da Sidebar (data-sidebar). Sem
+// isto, ambos só seriam aplicados depois da hidratação, causando flash do
+// tema padrão e deslocamento do layout. Chaves e atributos compartilhados com
+// lib/preferences; "true" é o valor legado da Sidebar antiga. Script
+// estático, sem dado do usuário.
+const PREFERENCES_INIT_SCRIPT = `(function(){try{var d=document.documentElement;var t=localStorage.getItem("theme");d.setAttribute("data-theme",t==="light"?"light":"dark");var s=localStorage.getItem("sidebar-collapsed");if(s==="collapsed"||s==="true")d.setAttribute("data-sidebar","collapsed");}catch(e){}})();`;
 
-// Executa antes do primeiro paint para evitar flash: aplica o data-theme
-// salvo no <html> assim que possível. Sem isto, o tema só seria aplicado
-// depois da hidratação do ThemeToggle, causando um flash visual do estado
-// padrão. Sem dependências novas — script estático, sem dado do usuário.
-const THEME_INIT_SCRIPT = `(function(){try{var t=localStorage.getItem("theme");document.documentElement.setAttribute("data-theme",t==="light"?"light":"dark");}catch(e){}})();`;
-
-const geistSans = Geist({
+// Geist self-hosted em app/fonts (latin, variável 100–900). Antes vinha do
+// Google Fonts via next/font/google; trocado para que o build não dependa de
+// fontes.googleapis.com. Para voltar, restaurar o next/font/google original.
+const geistSans = localFont({
+  src: "./fonts/geist-latin.woff2",
   variable: "--font-geist-sans",
-  subsets: ["latin"],
+  weight: "100 900",
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
+const geistMono = localFont({
+  src: "./fonts/geist-mono-latin.woff2",
   variable: "--font-geist-mono",
-  subsets: ["latin"],
+  weight: "100 900",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://zenaldodev.com.br"),
+  metadataBase: new URL(SITE_URL),
   title: {
-    default: "ZTech Solutions | Desenvolvimento de Software para Empresas",
+    default: "MyCod | Desenvolvimento de Software para Empresas",
     template: "%s",
   },
   description:
-    "A ZTech Solutions desenvolve sistemas web, SaaS, automações e soluções com inteligência artificial para empresas que querem ganhar produtividade, controle e escala.",
+    "A MyCod desenvolve sistemas web, SaaS, automações e soluções com inteligência artificial para empresas que querem ganhar produtividade, controle e escala.",
   alternates: {
     canonical: "/",
   },
   openGraph: {
     type: "website",
     locale: "pt_BR",
-    url: "https://zenaldodev.com.br",
-    siteName: "ZTech Solutions",
-    title: "ZTech Solutions | Desenvolvimento de Software para Empresas",
+    url: SITE_URL,
+    siteName: "MyCod",
+    title: "MyCod | Desenvolvimento de Software para Empresas",
     description:
       "Sistemas web, SaaS, automações e soluções com inteligência artificial para empresas que querem ganhar produtividade, controle e escala.",
     // TODO: adicionar `images` com um asset OG de 1200x630 assim que ele existir
@@ -52,7 +56,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary",
-    title: "ZTech Solutions | Desenvolvimento de Software para Empresas",
+    title: "MyCod | Desenvolvimento de Software para Empresas",
     description:
       "Sistemas web, SaaS, automações e soluções com inteligência artificial para empresas que querem ganhar produtividade, controle e escala.",
   },
@@ -68,20 +72,28 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
+    // suppressHydrationWarning: o script abaixo altera atributos do <html>
+    // (data-theme, data-sidebar) antes da hidratação, de propósito. Vale só
+    // para os atributos deste elemento, não para os filhos.
     <html
       lang="pt-BR"
       className={`${geistSans.variable} ${geistMono.variable}`}
+      suppressHydrationWarning
     >
       <head>
-        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+        {/* Script síncrono no <head>: roda antes do primeiro paint. O
+            beforeInteractive do next/script não garante essa ordem no App
+            Router. Conteúdo fixo e sem dado do usuário. */}
+        <script
+          id="mycod-preferences-init"
+          dangerouslySetInnerHTML={{ __html: PREFERENCES_INIT_SCRIPT }}
+        />
       </head>
       <body className="bg-background text-foreground">
+        <PageBackground />
+
         <LanguageProvider>
-          <Sidebar />
-
-          <GlobalControls />
-
-          <main className="min-h-screen md:ml-[280px]">{children}</main>
+          <AppShell>{children}</AppShell>
 
           <FloatingWhatsapp />
         </LanguageProvider>

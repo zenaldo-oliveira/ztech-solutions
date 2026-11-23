@@ -1,39 +1,166 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-/* Tokens de tema — base = identidade dark atual do site. [data-theme="light"]
-   é aplicado no <html> pelo ThemeToggle (via script anti-flash em
-   app/layout.tsx); não depende de prefers-color-scheme do SO, é escolha
-   explícita do usuário. Superfícies são cores sólidas (não translúcidas) —
-   um card translúcido branco ficaria quase invisível sobre o background
-   claro do Light Mode. */
+/* Estado recolhido da Sidebar no desktop — aplicado no <html> pelo script
+   anti-flash de app/layout.tsx (sem deslocamento de layout na carga). */
+@custom-variant sidebar-collapsed (html[data-sidebar="collapsed"] &);
+
+/* Tokens de tema. Base grafite quase preta com superfícies azul-marinho
+   muito escuras (não preto absoluto), bordas finas, cinzas suaves e
+   off-white; o roxo da marca MyCod aparece só em CTA, estado ativo, foco e
+   interação. [data-theme="light"] é aplicado no <html> pelo script
+   anti-flash de app/layout.tsx e alterado por useTheme (lib/preferences) —
+   escolha explícita do usuário, não prefers-color-scheme. Contrastes
+   verificados (WCAG AA): text-secondary ≥ 7:1 e text-muted ≥ 5:1 sobre
+   background/surface/surface-strong; texto branco sobre --cta ≈ 5.3:1 no
+   tema escuro e ≈ 9.5:1 no claro. */
 :root {
-  --background: #020617;
-  --foreground: #f8fafc;
-  --surface: #0f172a;
-  --surface-strong: #111827;
-  --surface-overlay: rgba(17, 24, 39, 0.97);
-  --border: rgba(255, 255, 255, 0.1);
-  --border-accent: rgba(6, 182, 212, 0.2);
-  --text-primary: #f8fafc;
-  --text-secondary: #cbd5e1;
-  --text-muted: #94a3b8;
-  --accent: #22d3ee;
-  --accent-strong: #06b6d4;
+  /* Paleta da marca (dark): azul-marinho, superfícies, azul para ações,
+     violeta para detalhes de IA e verde reservado ao WhatsApp. */
+  --background: #120c1f;
+  --foreground: #f5f3fa;
+  --surface: #1b1330;
+  --surface-strong: #261a45;
+  --surface-muted: rgba(185, 163, 240, 0.08);
+  --surface-overlay: rgba(27, 19, 48, 0.97);
+  --border: rgba(185, 163, 240, 0.14);
+  --border-strong: rgba(185, 163, 240, 0.28);
+  --border-accent: rgba(185, 163, 240, 0.35);
+  --text-primary: #f5f3fa;
+  --text-secondary: #cfc5e3;
+  --text-muted: #b3a7cc;
+  --accent: #b9a3f0;
+  --accent-strong: #9d82e6;
+  /* Ações no tema escuro: roxo mais claro que o da marca (#53377e), para o
+     botão se destacar do fundo. Texto branco ≈ 5.3:1; borda do botão contra
+     --background ≈ 3.6:1 (não textual, WCAG 1.4.11 exige 3:1). */
+  --cta: #7a5bb0;
+  --cta-hover: #6a4a9e;
+  --ring: #b9a3f0;
+  --ai: #b9a3f0;
+  --whatsapp: #22c55e;
+  /* Brilho do StarBorder (botões principais de contratação). */
+  --star-border-color: #b9a3f0;
+
+  /* Identidade MyCod: roxos da vinheta e lavanda das seções claras. */
+  --brand-purple: #53377e;
+  --brand-purple-deep: #422a69;
+  --brand-purple-light: #593d86;
+  --brand-lavender: #f7f4fc;
+  --brand-ink: #211733;
+
+  --sidebar-width: 15rem;
+  --topbar-height: 3.5rem;
+
+  /* Espaçamento vertical (components/ui/Section). Cada valor é o espaço
+     VISÍVEL entre seções consecutivas — mobile (390px) → desktop (1440px),
+     interpolado com clamp(). */
+  --space-section-compact: clamp(1.5rem, 1.129rem + 1.524vw, 2.5rem); /* 24 → 40px */
+  --space-section-default: clamp(2.5rem, 1.943rem + 2.286vw, 4rem); /* 40 → 64px */
+  --space-section-spacious: clamp(3.5rem, 2.571rem + 3.81vw, 6rem); /* 56 → 96px */
+  --space-hero-top: 1.25rem; /* 20px: Top Bar → primeiro conteúdo de cada página */
+  --space-header-gap: clamp(1.5rem, 1.129rem + 1.524vw, 2.5rem); /* 24 → 40px: SectionHeader → conteúdo */
+  /* Sidebar (desktop) e Top Bar rolada: levemente translúcidas sobre o
+     PageBackground — mais leves que uma superfície sólida. */
+  --sidebar-bg: rgba(18, 12, 31, 0.72);
+  --topbar-bg: rgba(18, 12, 31, 0.78);
+
+  /* PageBackground — cenário discreto; o conteúdo é o protagonista. */
+  --bg-glow: rgba(185, 163, 240, 0.10);
+  --bg-glow-accent: rgba(83, 55, 126, 0.16);
+  --bg-glow-deep: rgba(66, 42, 105, 0.22);
+  --bg-grid: rgba(185, 163, 240, 0.045);
+  --bg-media-opacity: 0.3;
+  --bg-media-overlay: rgba(8, 12, 20, 0.8);
+  /* Luz que acompanha o mouse (InteractiveBackground). */
+  --pointer-glow: rgba(83, 55, 126, 0.30);
+  --pointer-grid: rgba(185, 163, 240, 0.22);
+
+  /* Tokens do shadcn/ui (componentes de registro), alinhados à paleta da
+     MyCod pela função de cada um. Apontam para os tokens acima, então
+     acompanham [data-theme="light"] sem duplicar valores. Nenhum
+     componente atual os usa; existem para componentes futuros nascerem
+     com a paleta certa. */
+  --card: var(--surface);
+  --card-foreground: var(--text-primary);
+  --popover: var(--surface-strong);
+  --popover-foreground: var(--text-primary);
+  --primary: var(--cta);
+  --primary-foreground: #ffffff;
+  --secondary: var(--surface-strong);
+  --secondary-foreground: var(--text-primary);
+  --muted: var(--surface-strong);
+  --muted-foreground: var(--text-muted);
+  /* --accent é o azul de destaque da MyCod (texto e ícones); sobre ele, o
+     texto usa o fundo da página (contraste ≥ 4.5:1 nos dois temas). */
+  --accent-foreground: var(--background);
+  --destructive: #f87171;
+  --input: var(--border-strong);
+  --chart-1: #b9a3f0;
+  --chart-2: #9d82e6;
+  --chart-3: #593d86;
+  --chart-4: #d6c9f5;
+  --chart-5: #53377e;
+  --radius: 0.625rem;
+  --sidebar: var(--surface);
+  --sidebar-foreground: var(--text-primary);
+  --sidebar-primary: var(--cta);
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: var(--surface-strong);
+  --sidebar-accent-foreground: var(--text-primary);
+  --sidebar-border: var(--border);
+  --sidebar-ring: var(--ring);
+}
+
+html[data-sidebar="collapsed"] {
+  --sidebar-width: 4rem;
 }
 
 [data-theme="light"] {
-  --background: #f8fafc;
-  --foreground: #0f172a;
+  --background: #f7f4fc;
+  --foreground: #211733;
   --surface: #ffffff;
-  --surface-strong: #f1f5f9;
-  --surface-overlay: rgba(255, 255, 255, 0.98);
-  --border: #e2e8f0;
-  --border-accent: rgba(8, 145, 178, 0.3);
-  --text-primary: #0f172a;
-  --text-secondary: #334155;
-  --text-muted: #64748b;
-  --accent: #0891b2;
-  --accent-strong: #0e7490;
+  --surface-strong: #efeaf8;
+  --surface-muted: rgba(33, 23, 51, 0.05);
+  --surface-overlay: rgba(255, 255, 255, 0.97);
+  --border: #e2dcef;
+  --border-strong: #cbc1e0;
+  --border-accent: rgba(83, 55, 126, 0.3);
+  --text-primary: #211733;
+  --text-secondary: #4a3d66;
+  --text-muted: #5e5079;
+  --accent: #53377e;
+  --accent-strong: #422a69;
+  --cta: #53377e;
+  --cta-hover: #422a69;
+  --ring: #53377e;
+  --star-border-color: #593d86;
+  /* shadcn/ui: só o que não deriva dos tokens acima. */
+  --destructive: #dc2626;
+
+  --sidebar-bg: rgba(247, 244, 252, 0.72);
+  --topbar-bg: rgba(247, 244, 252, 0.8);
+
+  --bg-glow: rgba(83, 55, 126, 0.08);
+  --bg-glow-accent: rgba(89, 61, 134, 0.06);
+  --bg-glow-deep: rgba(66, 42, 105, 0.05);
+  --bg-grid: rgba(33, 23, 51, 0.045);
+  --bg-media-opacity: 0.18;
+  --bg-media-overlay: rgba(248, 250, 252, 0.82);
+  --pointer-glow: rgba(37, 99, 235, 0.11);
+  --pointer-grid: rgba(37, 99, 235, 0.16);
+}
+
+/* Telas pequenas: cenário ainda mais discreto (menos brilho, menos mídia). */
+@media (max-width: 767px) {
+  :root {
+    --bg-media-opacity: 0.18;
+  }
+
+  [data-theme="light"] {
+    --bg-media-opacity: 0.12;
+  }
 }
 
 @theme inline {
@@ -41,57 +168,445 @@
   --color-foreground: var(--foreground);
   --color-surface: var(--surface);
   --color-surface-strong: var(--surface-strong);
+  --color-surface-muted: var(--surface-muted);
   --color-surface-overlay: var(--surface-overlay);
   --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
   --color-border-accent: var(--border-accent);
   --color-text-primary: var(--text-primary);
   --color-text-secondary: var(--text-secondary);
   --color-text-muted: var(--text-muted);
   --color-accent: var(--accent);
   --color-accent-strong: var(--accent-strong);
+  --color-cta: var(--cta);
+  --color-cta-hover: var(--cta-hover);
+  --color-ai: var(--ai);
+  --color-whatsapp: var(--whatsapp);
+  --color-ring: var(--ring);
+  --color-brand-deep: var(--brand-purple-deep);
+  --color-brand-lavender: var(--brand-lavender);
 
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-geist-sans);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-input: var(--input);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+/* Âncoras (#solucoes, #cases...) não ficam escondidas atrás da Top Bar
+   fixa — 1rem extra de respiro. */
+html {
+  scroll-padding-top: calc(var(--topbar-height) + 1rem);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-@keyframes whatsappFloat {
-  0%,
+/* PageBackground (components/layout/PageBackground.tsx). Camadas, de baixo
+   para cima: base (gradientes estáticos — também é o fallback quando não há
+   vídeo, em movimento reduzido e no mobile), mídia (vídeo ou poster, com
+   baixa opacidade), overlay azul-grafite (garante contraste) e grid. */
+.page-background__base {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(60rem 36rem at 12% -8%, var(--bg-glow), transparent 70%),
+    radial-gradient(44rem 30rem at 92% 2%, var(--bg-glow-accent), transparent 70%),
+    radial-gradient(56rem 40rem at 60% 115%, var(--bg-glow-deep), transparent 70%);
+}
+
+.page-background__media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background-size: cover;
+  background-position: center;
+  opacity: var(--bg-media-opacity);
+}
+
+.page-background__overlay {
+  position: absolute;
+  inset: 0;
+  background: var(--bg-media-overlay);
+}
+
+@media (max-width: 767px) {
+  .page-background__base {
+    opacity: 0.7;
+  }
+}
+
+.page-background__grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(to right, var(--bg-grid) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--bg-grid) 1px, transparent 1px);
+  background-size: 64px 64px;
+  -webkit-mask-image: radial-gradient(ellipse 80% 55% at 50% 0%, #000 25%, transparent 75%);
+  mask-image: radial-gradient(ellipse 80% 55% at 50% 0%, #000 25%, transparent 75%);
+}
+
+/* Ritmo vertical das seções (components/ui/Section). O espaço ANTES de uma
+   seção pertence a ela: só padding-top, nunca padding-bottom — paddings
+   adjacentes não se somam e o intervalo visível entre A e B é exatamente o
+   token da variante de B. Só a última seção da página reserva espaço antes
+   do rodapé. Em @layer components para que utilitários ainda possam
+   sobrescrever quando houver motivo. */
+@layer components {
+  .section {
+    padding-top: var(--section-gap);
+    padding-bottom: 0;
+  }
+
+  .section:last-child {
+    padding-bottom: var(--space-section-default);
+  }
+
+  .section--compact {
+    --section-gap: var(--space-section-compact);
+  }
+
+  .section--default {
+    --section-gap: var(--space-section-default);
+  }
+
+  .section--spacious {
+    --section-gap: var(--space-section-spacious);
+  }
+
+  /* Abertura de página: distância própria da Top Bar; o espaço abaixo
+     pertence ao bloco seguinte. */
+  .section--hero {
+    --section-gap: var(--space-hero-top);
+  }
+
+  /* /services (ServicesContent): catálogo de cards grandes com ilustração —
+     pede mais respiro entre seções que o ritmo global (64 → 96px, mobile →
+     desktop). Escopo da página; os tokens globais não mudam. */
+  .services-page .section:not(.section--hero) {
+    --section-gap: clamp(4rem, 3.257rem + 3.048vw, 6rem);
+  }
+}
+
+/* Tooltips da Sidebar (components/layout/Sidebar.tsx). Só no desktop: nos
+   itens com a barra recolhida e no botão de recolher/expandir
+   (.sidebar-tip--always). Aparecem no hover e no foco por teclado, ficam
+   colados ao item (o ponteiro pode passar sobre eles) e somem com Esc
+   (#sidebar[data-tooltips="off"]) — WCAG 1.4.13. */
+.sidebar-tooltip {
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  z-index: 60;
+  padding-left: 0.5rem;
+  transform: translateY(-50%);
+  visibility: hidden;
+  opacity: 0;
+  transition:
+    opacity 0.12s ease,
+    visibility 0.12s;
+}
+
+.sidebar-tooltip__label {
+  display: block;
+  white-space: nowrap;
+  border: 1px solid var(--border-strong);
+  border-radius: 0.375rem;
+  background: var(--surface-strong);
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  color: var(--text-primary);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+@media (min-width: 1024px) {
+  html[data-sidebar="collapsed"] .sidebar-tip:hover > .sidebar-tooltip,
+  html[data-sidebar="collapsed"] .sidebar-tip:has(:focus-visible) > .sidebar-tooltip,
+  .sidebar-tip--always:hover > .sidebar-tooltip,
+  .sidebar-tip--always:has(:focus-visible) > .sidebar-tooltip {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  #sidebar[data-tooltips="off"] .sidebar-tooltip {
+    visibility: hidden;
+    opacity: 0;
+  }
+}
+
+/* InteractiveBackground (components/layout/InteractiveBackground.tsx): luz
+   radial que segue o mouse e, em /services, uma grade revelada ao redor do
+   cursor. A posição chega pelo `transform` de cada camada (escrito via ref,
+   só enquanto o mouse se move): nada é repintado, a GPU só recompõe. Sem
+   mouse (touch) ou com movimento reduzido, data-active nunca é ligado e as
+   camadas ficam invisíveis. */
+.interactive-bg {
+  --glow-size: 34rem;
+  --glow-strength: 0.5;
+  --grid-window: 36rem;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.interactive-bg[data-variant="glow"] {
+  --glow-size: 44rem;
+  --glow-strength: 1;
+}
+
+.interactive-bg[data-variant="grid"] {
+  --glow-size: 36rem;
+  --glow-strength: 0.6;
+}
+
+.interactive-bg[data-intensity="minimal"] {
+  --glow-size: 28rem;
+  --glow-strength: 0.28;
+}
+
+.interactive-bg[data-variant="none"] {
+  display: none;
+}
+
+/* Posição inicial (0,0) deslocada pela metade do tamanho: o transform
+   translate3d(x, y) do JS coloca o centro exatamente no cursor. */
+.interactive-bg__glow,
+.interactive-bg__grid-window {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  will-change: transform;
+}
+
+.interactive-bg__glow {
+  width: var(--glow-size);
+  height: var(--glow-size);
+  margin: calc(var(--glow-size) / -2) 0 0 calc(var(--glow-size) / -2);
+  border-radius: 50%;
+  background: radial-gradient(closest-side, var(--pointer-glow), transparent);
+}
+
+/* Recorte circular com máscara estática (não muda com o movimento). */
+.interactive-bg__grid-window {
+  display: none;
+  width: var(--grid-window);
+  height: var(--grid-window);
+  margin: calc(var(--grid-window) / -2) 0 0 calc(var(--grid-window) / -2);
+  overflow: hidden;
+  -webkit-mask-image: radial-gradient(closest-side, #000, transparent 85%);
+  mask-image: radial-gradient(closest-side, #000, transparent 85%);
+}
+
+/* Grade do tamanho da tela, contra-deslocada pelo JS: as linhas ficam fixas
+   e coincidem com a grade do PageBackground (mesmo passo de 64px). */
+.interactive-bg__grid {
+  position: absolute;
+  top: calc(var(--grid-window) / 2);
+  left: calc(var(--grid-window) / 2);
+  width: 100vw;
+  height: 100vh;
+  background-image:
+    linear-gradient(to right, var(--pointer-grid) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--pointer-grid) 1px, transparent 1px);
+  background-size: 64px 64px;
+  will-change: transform;
+}
+
+.interactive-bg[data-variant="grid"] .interactive-bg__grid-window {
+  display: block;
+}
+
+.interactive-bg[data-active="true"] .interactive-bg__glow {
+  opacity: var(--glow-strength);
+}
+
+.interactive-bg[data-active="true"] .interactive-bg__grid-window {
+  opacity: 1;
+}
+
+/* Palco das mídias dos cards de projeto (components/projects/ProjectMedia):
+   brilho sutil do accent no topo sobre a superfície, com a mesma grade do
+   fundo da página — derivado dos tokens, funciona nos dois temas. */
+.project-media {
+  background:
+    radial-gradient(110% 80% at 50% 0%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 70%),
+    linear-gradient(180deg, var(--surface-strong), var(--surface));
+}
+
+.project-media::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(to right, var(--bg-grid) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--bg-grid) 1px, transparent 1px);
+  background-size: 28px 28px;
+  -webkit-mask-image: radial-gradient(ellipse 75% 70% at 50% 30%, #000 20%, transparent 80%);
+  mask-image: radial-gradient(ellipse 75% 70% at 50% 30%, #000 20%, transparent 80%);
+  pointer-events: none;
+}
+
+/* StarBorder (components/ui/StarBorder): dois brilhos radiais correm em
+   sentidos opostos nas bordas superior e inferior (2px) do botão. */
+.star-border {
+  position: relative;
+  display: inline-flex;
+  overflow: hidden;
+  isolation: isolate;
+  padding: 2px 0;
+}
+
+.star-border__glow {
+  position: absolute;
+  z-index: 0;
+  width: 300%;
+  height: 50%;
+  border-radius: 50%;
+  opacity: 1;
+  pointer-events: none;
+  background: radial-gradient(circle, var(--star-border-color), transparent 16%);
+  animation-duration: var(--star-border-speed, 6s);
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+
+.star-border__glow--bottom {
+  right: -250%;
+  bottom: -11px;
+  animation-name: starBorderBottom;
+}
+
+.star-border__glow--top {
+  top: -10px;
+  left: -250%;
+  animation-name: starBorderTop;
+}
+
+.star-border__inner {
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes starBorderBottom {
+  0% {
+    transform: translate(0%, 0%);
+    opacity: 1;
+  }
+
   100% {
-    transform: translateY(0);
-  }
-
-  50% {
-    transform: translateY(-6px);
+    transform: translate(-100%, 0%);
+    opacity: 0;
   }
 }
 
-.whatsapp-float {
-  animation: whatsappFloat 3s ease-in-out infinite;
-}
+@keyframes starBorderTop {
+  0% {
+    transform: translate(0%, 0%);
+    opacity: 1;
+  }
 
-@keyframes aiGlow {
-  0%,
   100% {
-    box-shadow:
-      0 0 15px rgba(6, 182, 212, 0.25),
-      0 0 30px rgba(6, 182, 212, 0.15);
-  }
-
-  50% {
-    box-shadow:
-      0 0 25px rgba(6, 182, 212, 0.45),
-      0 0 50px rgba(6, 182, 212, 0.25);
+    transform: translate(100%, 0%);
+    opacity: 0;
   }
 }
 
-.ai-glow {
-  animation: aiGlow 2.5s ease-in-out infinite;
+@media (prefers-reduced-motion: reduce) {
+  .star-border__glow {
+    animation: none;
+    opacity: 0;
+  }
+}
+
+/* Entradas ao rolar (components/ui/Reveal e ProcessSection, marcadas com
+   data-reveal): só deslocamento/escala, nunca ocultação. Com movimento
+   reduzido e na impressão, ficam na posição final desde o HTML — o
+   framer só conhece a preferência depois da hidratação. */
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] {
+    transform: none !important;
+  }
+}
+
+@media print {
+  [data-reveal] {
+    transform: none !important;
+  }
+}
+
+/* Título do Hero: cada palavra sobe em cascata uma única vez. Só desloca
+   (nunca oculta), então o título continua legível sem JavaScript. Vale tanto
+   para o texto puro quanto para as palavras do efeito de mouse. */
+.hero-word-rise [data-word] {
+  display: inline-block;
+  animation: hero-word-rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.hero-word-rise [data-word]:nth-child(1) { animation-delay: 0.05s; }
+.hero-word-rise [data-word]:nth-child(2) { animation-delay: 0.12s; }
+.hero-word-rise [data-word]:nth-child(3) { animation-delay: 0.19s; }
+.hero-word-rise [data-word]:nth-child(4) { animation-delay: 0.26s; }
+.hero-word-rise [data-word]:nth-child(5) { animation-delay: 0.33s; }
+.hero-word-rise [data-word]:nth-child(6) { animation-delay: 0.4s; }
+.hero-word-rise [data-word]:nth-child(7) { animation-delay: 0.47s; }
+.hero-word-rise [data-word]:nth-child(n + 8) { animation-delay: 0.54s; }
+
+@keyframes hero-word-rise {
+  from {
+    transform: translateY(0.35em);
+  }
+  to {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-word-rise [data-word] {
+    animation: none;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -103,4 +618,52 @@ body {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+}
+/* Primeira seção da home: gradiente da vinheta com texto branco. Sobrescreve
+   os tokens de texto só dentro da seção, então o restante do site não muda. */
+.brand-hero {
+  background: radial-gradient(ellipse at center, #593d86 0%, #53377e 45%, #422a69 100%);
+  --text-primary: #ffffff;
+  --text-secondary: #ece6fa;
+  --text-muted: #d9cfee;
+  --border: rgba(255, 255, 255, 0.18);
+  --border-strong: rgba(255, 255, 255, 0.32);
+}
+
+/* Painéis dentro do hero roxo: .brand-hero fixa o texto em branco para o copy
+   sobre o gradiente. Aqui os tokens voltam aos do tema (escuro ou claro), para
+   o cartão de demonstração continuar legível nos dois temas. */
+.hero-panel {
+  --background: #120c1f;
+  --surface: #1b1330;
+  --surface-strong: #261a45;
+  --border: rgba(185, 163, 240, 0.14);
+  --border-strong: rgba(185, 163, 240, 0.28);
+  --text-primary: #f5f3fa;
+  --text-secondary: #cfc5e3;
+  --text-muted: #b3a7cc;
+}
+
+[data-theme="light"] .hero-panel {
+  --background: #f7f4fc;
+  --surface: #ffffff;
+  --surface-strong: #efeaf8;
+  --border: #e2dcef;
+  --border-strong: #cbc1e0;
+  --text-primary: #211733;
+  --text-secondary: #4a3d66;
+  --text-muted: #5e5079;
 }

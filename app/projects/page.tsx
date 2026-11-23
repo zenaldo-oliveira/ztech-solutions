@@ -2,9 +2,9 @@ import { ProjectsContent } from "@/components/projects/ProjectsContent";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Cases e Projetos | ZTech Solutions",
+  title: "Cases e Projetos | MyCod",
   description:
-    "Cases e projetos desenvolvidos pela ZTech Solutions: sistemas, plataformas e aplicações reais, com o problema resolvido e a solução entregue em cada um.",
+    "Cases e projetos desenvolvidos pela MyCod: sistemas, plataformas e aplicações reais, com o problema resolvido e a solução entregue em cada um.",
   keywords: [
     "cases de desenvolvimento de software",
     "projetos full stack",

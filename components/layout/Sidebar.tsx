@@ -1,375 +1,277 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
-import { FaGithub, FaLinkedin } from "react-icons/fa";
-import { useTranslations } from "@/lib/i18n/LanguageContext";
-
+import { useEffect, useRef, useSyncExternalStore } from "react";
+import { motion } from "framer-motion";
 import {
-  Menu,
+  AppWindow,
+  Building2,
+  ClipboardList,
+  FolderKanban,
+  House,
+  MessageSquare,
+  ReceiptText,
+  Route,
+  PanelLeftClose,
+  PanelLeftOpen,
   X,
-  Home,
-  User,
-  Briefcase,
-  Wrench,
-  Award,
-  FileText,
-  Mail,
-  ChevronLeft,
-  ChevronRight,
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import { GlobalControls } from "@/components/layout/GlobalControls";
+import { Logo } from "@/components/layout/Logo";
+import { DESKTOP_QUERY, MobileMenu } from "@/components/layout/MobileMenu";
+import { useTranslations } from "@/lib/i18n/LanguageContext";
+import { useSidebarCollapsed } from "@/lib/preferences";
+import { ABOUT_NAV, isNavItemActive, MAIN_NAV, QUOTE_NAV } from "@/lib/site";
+import type { NavItem } from "@/lib/site";
 
-const COLLAPSE_STORAGE_KEY = "sidebar-collapsed";
-const COLLAPSED_WIDTH = "5rem"; // 80px — mesmo valor de w-20, usado no <style> abaixo
+export const SIDEBAR_ID = "sidebar";
 
-export function Sidebar() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [isCollapsed, setIsCollapsed] = useState(false);
-  const pathname = usePathname();
-  const [lastPathname, setLastPathname] = useState(pathname);
+const NAV_ICONS: Record<NavItem["key"], LucideIcon> = {
+  home: House,
+  services: AppWindow,
+  plans: ReceiptText,
+  build: ClipboardList,
+  howItWorks: Route,
+  projects: FolderKanban,
+  about: Building2,
+  contact: MessageSquare,
+};
+
+function subscribeToDesktop(onChange: () => void) {
+  const query = window.matchMedia(DESKTOP_QUERY);
+  query.addEventListener("change", onChange);
+  return () => query.removeEventListener("change", onChange);
+}
+
+// Snapshot do servidor = desktop: o HTML inicial nunca sai com `inert` (que
+// travaria a Sidebar fixa até a hidratação). No mobile, antes da hidratação,
+// o drawer fechado já está fora da tela e `invisible` via CSS.
+function useIsDesktop(): boolean {
+  return useSyncExternalStore(
+    subscribeToDesktop,
+    () => window.matchMedia(DESKTOP_QUERY).matches,
+    () => true,
+  );
+}
+
+type SidebarProps = {
+  isDrawerOpen: boolean;
+  onCloseDrawer: (restoreFocus?: boolean) => void;
+};
+
+// Navegação principal do site.
+// - lg+: barra fixa à esquerda (15rem), recolhível para 4rem pelo botão no
+//   topo. O estado recolhido fica no atributo data-sidebar do <html>
+//   (lib/preferences), aplicado antes do primeiro paint — os estilos
+//   "recolhida" são só CSS (variante sidebar-collapsed), sem flash nem
+//   deslocamento de layout. Recolhida, cada ícone ganha um tooltip
+//   (.sidebar-tooltip em globals.css) no hover e no foco por teclado.
+// - < lg: drawer aberto pelo botão da Top Bar; comportamento de foco/Esc/
+//   overlay/scroll lock em MobileMenu.
+export function Sidebar({ isDrawerOpen, onCloseDrawer }: SidebarProps) {
   const t = useTranslations();
+  const pathname = usePathname();
+  const panelRef = useRef<HTMLDivElement>(null);
+  const isDesktop = useIsDesktop();
+  const [isCollapsed, setCollapsed] = useSidebarCollapsed();
 
-  // Fecha o menu mobile ao trocar de página
-  if (pathname !== lastPathname) {
-    setLastPathname(pathname);
-    setIsOpen(false);
-  }
+  const isHiddenDrawer = !isDesktop && !isDrawerOpen;
+  const collapseLabel = isCollapsed ? t.sidebar.expand : t.sidebar.collapse;
 
-  // Lê a preferência salva só no client, depois da hidratação (evita mismatch SSR/client).
-  // Sincronizar com localStorage (sistema externo) exige setState pós-montagem — não há
-  // como ler localStorage durante a renderização, que também roda no servidor.
+  // WCAG 1.4.13: Esc dispensa o tooltip visível sem mover o ponteiro nem o
+  // foco; ele volta no próximo foco ou quando o ponteiro sai da barra.
   useEffect(() => {
-    const stored = window.localStorage.getItem(COLLAPSE_STORAGE_KEY);
+    const panel = panelRef.current;
+    if (!panel) return;
 
-    if (stored === "true") {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setIsCollapsed(true);
-    }
+    const dismiss = (event: KeyboardEvent) => {
+      if (event.key === "Escape") panel.dataset.tooltips = "off";
+    };
+    const restore = () => {
+      delete panel.dataset.tooltips;
+    };
+
+    document.addEventListener("keydown", dismiss);
+    panel.addEventListener("focusin", restore);
+    panel.addEventListener("pointerleave", restore);
+    return () => {
+      document.removeEventListener("keydown", dismiss);
+      panel.removeEventListener("focusin", restore);
+      panel.removeEventListener("pointerleave", restore);
+    };
   }, []);
 
-  // Sincroniza o estado com <body> (para o <main> reagir via CSS) e persiste a escolha.
-  useEffect(() => {
-    document.body.classList.toggle("sidebar-collapsed", isCollapsed);
-    window.localStorage.setItem(COLLAPSE_STORAGE_KEY, String(isCollapsed));
-  }, [isCollapsed]);
-
-  const menuItems = [
-    {
-      href: "/",
-      label: t.nav.home,
-      icon: Home,
-    },
-    {
-      href: "/about",
-      label: t.nav.about,
-      icon: User,
-    },
-    {
-      href: "/services",
-      label: t.nav.services,
-      icon: Wrench,
-    },
-    {
-      href: "/projects",
-      label: t.nav.projects,
-      icon: Briefcase,
-    },
-    {
-      href: "/skills",
-      label: t.nav.skills,
-      icon: Award,
-    },
-    {
-      href: "/certificates",
-      label: t.nav.certificates,
-      icon: FileText,
-    },
-    {
-      href: "/contact",
-      label: t.nav.contact,
-      icon: Mail,
-    },
-  ];
+  function renderLink(item: NavItem) {
+    return (
+      <SidebarLink
+        key={item.href}
+        href={item.href}
+        label={t.nav[item.key]}
+        Icon={NAV_ICONS[item.key]}
+        isActive={isNavItemActive(item.href, pathname)}
+        onNavigate={() => onCloseDrawer(false)}
+      />
+    );
+  }
 
   return (
     <>
-      {/* Faz o <main> (definido em app/layout.tsx) respeitar a largura recolhida
-          no desktop, sem precisar alterar layout.tsx nem globals.css.
-          Também esconde o indicador visual da barra de rolagem da Sidebar
-          SOMENTE quando recolhida no desktop — o scroll continua funcional
-          (overflow-y-auto nunca vira "hidden"), então nenhum ícone fica
-          inacessível em viewports muito baixas; só o traço cinza some. */}
-      <style>{`
-        @media (min-width: 768px) {
-          main {
-            transition: margin-left 300ms ease;
-          }
-          body.sidebar-collapsed main {
-            margin-left: ${COLLAPSED_WIDTH};
-          }
-          body.sidebar-collapsed .sidebar-scroll {
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-          }
-          body.sidebar-collapsed .sidebar-scroll::-webkit-scrollbar {
-            display: none;
-          }
-        }
-      `}</style>
+      <MobileMenu
+        isOpen={isDrawerOpen}
+        onClose={onCloseDrawer}
+        panelRef={panelRef}
+      />
 
-      {/* BOTÃO MENU MOBILE */}
-      <button
-        type="button"
-        aria-label="Abrir menu"
-        onClick={() => setIsOpen(true)}
-        className="
-            fixed
-            left-4
-            top-4
-            z-50
-            rounded-2xl
-            border
-            border-border-accent
-            bg-surface-strong/90
-            p-3
-            text-accent
-            backdrop-blur-xl
-            shadow-[0_0_20px_rgba(6,182,212,0.20)]
-            transition-all
-            duration-300
-            hover:scale-105
-            hover:border-cyan-500/50
-            hover:bg-cyan-500/10
-            focus-visible:outline-none
-            focus-visible:ring-2
-            focus-visible:ring-cyan-500/60
-            md:hidden
-          "
+      <div
+        id={SIDEBAR_ID}
+        ref={panelRef}
+        inert={isHiddenDrawer || undefined}
+        // visibility só entra na transição ao FECHAR (espera o slide terminar
+        // para esconder). Ao abrir, fica visível no mesmo frame — senão o
+        // painel ainda estaria hidden quando o MobileMenu move o foco.
+        className={`fixed inset-y-0 left-0 z-50 flex w-[min(18rem,85vw)] flex-col border-r border-border bg-background duration-200 lg:bg-(--sidebar-bg) ease-out motion-reduce:transition-none lg:visible lg:z-30 lg:w-(--sidebar-width) lg:translate-x-0 ${
+          isDrawerOpen
+            ? "visible translate-x-0 transition-[transform,width]"
+            : "invisible -translate-x-full transition-[transform,visibility,width]"
+        }`}
       >
-        <Menu
-          size={22}
-          strokeWidth={2.5}
-          className="transition-transform duration-300 hover:rotate-90"
-        />
-      </button>
+        <div className="group/brand relative flex h-(--topbar-height) shrink-0 items-center justify-between gap-2 border-b border-border px-4 lg:pr-2 lg:sidebar-collapsed:justify-center lg:sidebar-collapsed:px-0">
+          <Logo
+            priority
+            onClick={() => onCloseDrawer(false)}
+            nameClassName="lg:sidebar-collapsed:sr-only"
+          />
 
-      {/* OVERLAY */}
-      {isOpen && (
-        <div
-          className="fixed inset-0 z-40 bg-black/60 md:hidden"
-          onClick={() => setIsOpen(false)}
-        />
-      )}
+          {/* Recolher/expandir no topo (desktop). Recolhida, o botão aparece
+              sobre o símbolo da MyCod no hover ou no foco por teclado. Sem
+              aria-label: o nome vem do texto oculto (padrão das suítes E2E). */}
+          <div className="sidebar-tip sidebar-tip--always hidden lg:block lg:sidebar-collapsed:absolute lg:sidebar-collapsed:inset-0 lg:sidebar-collapsed:flex lg:sidebar-collapsed:items-center lg:sidebar-collapsed:justify-center">
+            <button
+              type="button"
+              aria-controls={SIDEBAR_ID}
+              aria-expanded={!isCollapsed}
+              onClick={() => setCollapsed(!isCollapsed)}
+              className="flex h-8 w-8 items-center justify-center rounded-md text-text-muted transition-[color,background-color,opacity] duration-150 hover:bg-surface-muted hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transition-none lg:sidebar-collapsed:bg-surface-strong lg:sidebar-collapsed:text-text-primary lg:sidebar-collapsed:opacity-0 lg:sidebar-collapsed:group-hover/brand:opacity-100 lg:sidebar-collapsed:focus-visible:opacity-100"
+            >
+              {isCollapsed ? (
+                <PanelLeftOpen size={16} strokeWidth={1.75} aria-hidden="true" />
+              ) : (
+                <PanelLeftClose size={16} strokeWidth={1.75} aria-hidden="true" />
+              )}
+              <span className="sr-only">{collapseLabel}</span>
+            </button>
+            <SidebarTooltip label={collapseLabel} />
+          </div>
 
-      {/* SIDEBAR */}
-      <aside
-        className={`
-        sidebar-scroll
-        fixed left-0 top-0 z-50 h-screen w-[280px]
-        border-r border-border
-        bg-surface-strong
-        flex flex-col
-        overflow-y-auto overflow-x-hidden
-        transition-transform duration-300
-        ${isOpen ? "translate-x-0" : "-translate-x-full"}
-        md:translate-x-0
-        ${isCollapsed ? "md:w-20" : "md:w-[280px]"}
-        md:transition-[width]
-      `}
-      >
-        {/* BOTÃO FECHAR (mobile) */}
-        <button
-          type="button"
-          aria-label="Fechar menu"
-          onClick={() => setIsOpen(false)}
-          className="
-            absolute right-4 top-4
-            flex h-10 w-10 items-center justify-center
-            rounded-full bg-zinc-800/80
-            text-white
-            transition-all duration-300
-            hover:rotate-180
-            hover:bg-red-500
-            focus-visible:outline-none
-            focus-visible:ring-2
-            focus-visible:ring-cyan-500/60
-            md:hidden
-          "
-        >
-          <X size={20} />
-        </button>
-
-        {/* TOGGLE EXPANDIR/RECOLHER (desktop) — no topo, junto ao cabeçalho */}
-        <div
-          className={`hidden md:flex px-3 pt-3 ${
-            isCollapsed ? "justify-center" : "justify-end"
-          }`}
-        >
           <button
             type="button"
-            aria-label={isCollapsed ? "Expandir menu" : "Recolher menu"}
-            aria-expanded={!isCollapsed}
-            onClick={() => setIsCollapsed((prev) => !prev)}
-            className="
-              flex h-7 w-7 items-center justify-center
-              rounded-lg
-              text-cyan-400
-              transition-all duration-300
-              hover:bg-cyan-500/10 hover:text-cyan-300
-              focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/60
-            "
+            aria-label={t.topbar.closeMenu}
+            onClick={() => onCloseDrawer(true)}
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md text-text-secondary transition-colors hover:bg-surface-muted hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring lg:hidden"
           >
-            {isCollapsed ? (
-              <ChevronRight size={16} />
-            ) : (
-              <ChevronLeft size={16} />
-            )}
+            <X size={18} strokeWidth={1.75} aria-hidden="true" />
           </button>
         </div>
 
-        {/* PERFIL */}
-        <div
-          className={`flex flex-col items-center ${isCollapsed ? "p-4" : "p-8"}`}
+        <nav
+          aria-label={t.sidebar.navLabel}
+          // Recolhida: sem rolagem, para os tooltips poderem sair da barra
+          // (os 5 itens cabem em qualquer altura de desktop).
+          className="flex-1 overflow-y-auto overflow-x-hidden px-2 py-3 lg:sidebar-collapsed:overflow-x-visible lg:sidebar-collapsed:overflow-y-visible"
         >
-          <Image
-            src="/projects/logo-ztech.png"
-            alt="ZTech Solutions"
-            width={150}
-            height={150}
-            priority
-            className={`
-      rounded-full
-      border-2
-      border-cyan-400/40
-      shadow-[0_0_40px_rgba(34,211,238,0.6)]
-      transition-all
-      duration-300
-      hover:scale-105
-      ${isCollapsed ? "h-10 w-10" : "h-[150px] w-[150px]"}
-    `}
-          />
-
-          <div className={isCollapsed ? "sr-only" : ""}>
-            <p className="mt-4 text-center text-xl font-bold text-text-primary">
-              ZTech Solutions
-            </p>
-
-            <p className="mt-1 text-xs uppercase tracking-[0.2em] text-accent">
-              {t.sidebar.tagline}
-            </p>
-
-            <div className="mt-3 flex items-center gap-2 rounded-full bg-green-500/10 px-3 py-1 text-xs text-green-400">
-              <span className="h-2 w-2 rounded-full bg-green-400 animate-pulse" />
-              {t.sidebar.availableForProjects}
-            </div>
-
-            <p className="mt-4 text-center text-sm leading-relaxed text-text-muted">
-              {t.sidebar.description}
-            </p>
-          </div>
-        </div>
-
-        {/* MENU */}
-        <nav className={isCollapsed ? "flex-1 px-2 pb-6" : "flex-1 px-6 pb-6"}>
-          <ul className="space-y-2">
-            {menuItems.map((item) => {
-              const Icon = item.icon;
-
-              return (
-                <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    title={item.label}
-                    className={`
-          flex items-center gap-3
-          rounded-lg px-4 py-3
-          transition-all duration-300
-          focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/60
-          ${isCollapsed ? "justify-center" : ""}
-          ${
-            pathname === item.href
-              ? "border border-cyan-500 bg-cyan-500/20 text-accent"
-              : item.href === "/contact"
-                ? "bg-cyan-500/10 text-cyan-300 hover:bg-cyan-500/20"
-                : "text-text-secondary hover:bg-cyan-500/10 hover:text-text-primary"
-          }
-        `}
-                  >
-                    <Icon size={18} />
-                    <span className={isCollapsed ? "sr-only" : ""}>
-                      {item.label}
-                    </span>
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
+          <ul className="space-y-0.5">{MAIN_NAV.map(renderLink)}</ul>
         </nav>
 
-        {/* RODAPÉ */}
-        <div
-          className={`mt-auto flex w-full border-t border-border p-4 ${
-            isCollapsed ? "flex-col items-center gap-2" : "justify-center gap-2"
-          }`}
-        >
-          <Link
-            href="https://www.linkedin.com/in/zenaldo-pereira-oliveira/"
-            target="_blank"
-            title="LinkedIn"
-            aria-label="LinkedIn"
-            className={`
-              flex
-              items-center
-              justify-center
-              gap-2
-              rounded-xl
-              bg-[#0A66C2]
-              text-sm
-              font-semibold
-              text-white
-              transition-all
-              duration-300
-              hover:-translate-y-1
-              hover:bg-[#004182]
-              focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/60
-              ${isCollapsed ? "h-10 w-10" : "w-[85px] px-4 py-2"}
-            `}
-          >
-            {isCollapsed ? <FaLinkedin size={18} /> : "LinkedIn"}
-          </Link>
-
-          <Link
-            href="https://github.com/zenaldo-oliveira"
-            target="_blank"
-            title="GitHub"
-            aria-label="GitHub"
-            className={`
-          flex
-          items-center
-          justify-center
-          gap-2
-          rounded-xl
-          border
-          border-[#F4F2EE]/20
-          bg-[#F4F2EE]/10
-          text-sm
-          font-medium
-          text-[#F4F2EE]
-          transition-all
-          duration-300
-          hover:-translate-y-1
-          hover:border-[#F4F2EE]/50
-          hover:bg-[#F4F2EE]/15
-          focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/60
-          ${isCollapsed ? "h-10 w-10" : "w-[85px] px-3 py-2"}
-        `}
-          >
-            {isCollapsed ? <FaGithub size={18} /> : "GitHub"}
-          </Link>
+        {/* Base: institucional, configurações e o único destaque — o pedido
+            de orçamento (fluxo de proposta em /build). */}
+        <div className="shrink-0 space-y-1 border-t border-border p-2">
+          <nav aria-label={t.sidebar.footerNavLabel}>
+            <ul>{renderLink(ABOUT_NAV)}</ul>
+          </nav>
+          <GlobalControls />
+          <QuoteLink
+            label={t.sidebar.quoteCta}
+            isActive={isNavItemActive(QUOTE_NAV.href, pathname)}
+            onNavigate={() => onCloseDrawer(false)}
+          />
         </div>
-      </aside>
+      </div>
     </>
+  );
+}
+
+// Ação de orçamento: único item destacado da barra. Recolhida, vira só o
+// ícone com tooltip, como os demais itens.
+function QuoteLink({ label, isActive, onNavigate }: { label: string; isActive: boolean; onNavigate: () => void }) {
+  return (
+    <div className="sidebar-tip relative pt-1">
+      <Link
+        href={QUOTE_NAV.href}
+        aria-current={isActive ? "page" : undefined}
+        onClick={onNavigate}
+        className="flex h-10 items-center justify-center gap-2 rounded-md bg-cta px-3 text-sm font-semibold text-white transition-colors duration-150 hover:bg-cta-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background aria-[current=page]:ring-2 aria-[current=page]:ring-accent/60 lg:sidebar-collapsed:px-0"
+      >
+        <ClipboardList size={16} strokeWidth={2} aria-hidden="true" className="shrink-0" />
+        <span className="truncate lg:sidebar-collapsed:sr-only">{label}</span>
+      </Link>
+      <SidebarTooltip label={label} />
+    </div>
+  );
+}
+
+type SidebarLinkProps = {
+  href: string;
+  label: string;
+  Icon: LucideIcon;
+  isActive: boolean;
+  onNavigate: () => void;
+};
+
+// Rótulo visual da Sidebar recolhida. Decorativo para leitores de tela (o
+// nome acessível já vem do texto oculto do link/botão); fica colado ao item
+// para o ponteiro poder passar sobre ele sem que suma (WCAG 1.4.13).
+function SidebarTooltip({ label }: { label: string }) {
+  return (
+    <span aria-hidden="true" className="sidebar-tooltip">
+      <span className="sidebar-tooltip__label">{label}</span>
+    </span>
+  );
+}
+
+function SidebarLink({ href, label, Icon, isActive, onNavigate }: SidebarLinkProps) {
+  return (
+    <li className="sidebar-tip relative">
+      <Link
+        href={href}
+        aria-current={isActive ? "page" : undefined}
+        onClick={onNavigate}
+        className={`relative flex h-11 items-center gap-3 rounded-md px-3 text-sm transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring lg:h-9 lg:sidebar-collapsed:justify-center lg:sidebar-collapsed:px-0 ${
+          isActive
+            ? "bg-surface-muted font-medium text-text-primary"
+            : "text-text-secondary hover:bg-surface-muted hover:text-text-primary"
+        }`}
+      >
+        {/* Indicador do item ativo — desliza entre itens ao navegar
+            (sem movimento com prefers-reduced-motion, via MotionConfig). */}
+        {isActive && (
+          <motion.span
+            layoutId="sidebar-active-indicator"
+            aria-hidden="true"
+            className="absolute inset-y-2 left-0 w-0.5 rounded-full bg-accent"
+            transition={{ type: "spring", stiffness: 500, damping: 40 }}
+          />
+        )}
+        <Icon
+          size={16}
+          strokeWidth={1.75}
+          aria-hidden="true"
+          className={`shrink-0 ${isActive ? "text-accent" : ""}`}
+        />
+        <span className="truncate lg:sidebar-collapsed:sr-only">{label}</span>
+      </Link>
+      <SidebarTooltip label={label} />
+    </li>
   );
 }

@@ -1,3 +1,5 @@
+import type { CommercialCopy } from "@/lib/i18n/commercial-types";
+
 export type LanguageCode = "pt" | "en" | "es";
 
 export type Dictionary = {
@@ -5,95 +7,201 @@ export type Dictionary = {
     home: string;
     about: string;
     services: string;
+    plans: string;
+    build: string;
+    howItWorks: string;
     projects: string;
-    skills: string;
-    certificates: string;
     contact: string;
   };
-  sidebar: {
+  brand: {
     tagline: string;
-    availableForProjects: string;
     description: string;
   };
+  sidebar: {
+    navLabel: string;
+    // Base da Sidebar: rótulo da navegação institucional e ação de orçamento.
+    footerNavLabel: string;
+    quoteCta: string;
+    collapse: string;
+    expand: string;
+  };
+  topbar: {
+    skipToContent: string;
+    openMenu: string;
+    closeMenu: string;
+    breadcrumbLabel: string;
+  };
+  preferences: {
+    trigger: string;
+    language: string;
+    theme: string;
+    themeLight: string;
+    themeDark: string;
+    display: string;
+  };
+  footer: {
+    navTitle: string;
+    moreTitle: string;
+    contactTitle: string;
+    socialTitle: string;
+    whatsapp: string;
+    rights: string;
+  };
+  cta: {
+    talk: string;
+    whatsappAriaLabel: string;
+    // Complemento do nome acessível de CTAs de WhatsApp com rótulo próprio
+    // (WCAG 2.5.3: o nome acessível começa pelo texto visível).
+    whatsappHint: string;
+  };
   globalControls: {
-    themeToLight: string;
-    themeToDark: string;
     languageSelector: string;
     languageMenuLabel: string;
   };
   home: {
     hero: {
-      badge: string;
-      titleLine: string;
-      headlineSequence: string[];
+      eyebrow: string;
+      title: string;
       description: string;
       ctaPrimary: string;
       ctaSecondary: string;
+      ctaQuote: string;
+      ctaWhatsApp: string;
+      ctaConfigurator: string;
+      assurance: string;
+      services: { name: string; benefit: string }[];
+      chat: { header: string; outgoing: string; outgoingMeta: string; reply: string };
+      showcase: {
+        caption: string;
+        tablistLabel: string;
+        tabs: { sites: string; systems: string; ai: string };
+        sites: { situation: string; formTitle: string; client: string; service: string; place: string; channel: string; action: string; labels: { name: string; service: string; place: string } };
+        systems: {
+          situation: string;
+          columns: { new: string; progress: string; done: string };
+          title: string;
+          orders: { id: string; client: string; service: string }[];
+          incoming: { id: string; client: string; service: string };
+          tag: string;
+        };
+        ai: { situation: string; client: string; question: string; answer: string; tag: string; botName: string };
+      };
+      mockup: {
+        caption: string;
+        modules: string[];
+        ordersTitle: string;
+        newOrder: string;
+        checklistTitle: string;
+        checklistItems: string[];
+        reportTitle: string;
+      };
     };
-    problems: {
-      title: string;
+    capabilities: {
       items: string[];
-      quote: string;
-      cta: string;
     };
     solutions: {
-      title: string;
-      description: string;
-      items: string[];
-      viewAll: string;
+      flow: string[];
+    };
+    product: {
+      tagline: string;
+      flow: string[];
     };
     cases: {
+      eyebrow: string;
       title: string;
       description: string;
-      items: { category: string; description: string; status: string }[];
-      viewAll: string;
+      explore: string;
+      similar: string;
     };
+    // Etapas: t.commercial.howItWorks.steps (fonte única).
     howWeWork: {
-      title: string;
-      steps: string[];
-    };
-    ai: {
-      title: string;
-      description: string;
-      useCases: string[];
-    };
-    technologies: {
+      eyebrow: string;
       title: string;
     };
     finalCta: {
       title: string;
+      subtitle: string;
       description: string;
       cta: string;
+      secondary: string;
     };
   };
   about: {
-    badge: string;
+    eyebrow: string;
     title: string;
     description: string;
-    founderTitle: string;
-    founderBody: string;
-    formationTitle: string;
-    formationItems: string[];
-    interestsTitle: string;
-    interests: string[];
-  };
-  services: {
-    badge: string;
-    headlineSequence: string[];
-    description: string;
-    items: { title: string; description: string }[];
-    ctaTitle: string;
-    ctaContact: string;
-    ctaProjects: string;
+    cta: string;
+    secondaryCta: string;
+    capabilitiesTitle: string;
+    culture: {
+      eyebrow: string;
+      title: string;
+      description: string;
+      purposeLabel: string;
+      purpose: string;
+      missionLabel: string;
+      mission: string;
+      visionLabel: string;
+      vision: string;
+      valuesTitle: string;
+      howLabel: string;
+      values: { name: string; how: string }[];
+      openingLabel: string;
+      opening: string;
+      toneLabel: string;
+      tone: string;
+    };
+    proof: {
+      eyebrow: string;
+      title: string;
+      othersLabel: string;
+      cta: string;
+    };
+    founder: {
+      eyebrow: string;
+      title: string;
+      role: string;
+      body: string[];
+      formationTitle: string;
+      formationItems: string[];
+    };
+    tech: {
+      eyebrow: string;
+      title: string;
+      description: string;
+      // Áreas de /about#tecnologias (as tecnologias e os projetos ficam em
+      // components/about/AboutTech.tsx).
+      groups: Record<"web" | "mobile" | "backend" | "data" | "ai" | "automation", string>;
+      appliedIn: string;
+    };
+    finalCta: {
+      title: string;
+      subtitle: string;
+    };
   };
   projects: {
     badge: string;
-    headlineSequence: string[];
+    filterLabel: string;
+    filterAll: string;
+    allTitle: string;
     description: string;
     problemLabel: string;
     solutionLabel: string;
     demoLabel: string;
+    demonstrationBadge: string;
     githubLabel: string;
+    // Textos alternativos das capturas reais ({title} = nome do projeto).
+    media: {
+      screenshotAlt: string;
+      phoneAlts: [string, string];
+    };
+    carousel: {
+      region: string;
+      previous: string;
+      next: string;
+      goTo: string;
+      of: string;
+    };
     items: {
       category: string;
       problem: string;
@@ -101,38 +209,14 @@ export type Dictionary = {
       status: string;
     }[];
   };
-  skills: {
-    badge: string;
-    headlineSequence: string[];
-    description: string;
-    categories: { title: string }[];
-    stats: { value: string; label: string }[];
-  };
-  certificates: {
-    badge: string;
-    headlineSequence: string[];
-    description: string;
-    formationTitle: string;
-    formationDescription: string;
-    coursesTitle: string;
-    items: { title: string; institution: string; status: string }[];
-    studyingTitle: string;
-    studyingItems: string[];
-  };
   contact: {
-    badge: string;
-    headlineSequence: string[];
-    description: string;
-    quickLinks: {
-      whatsapp: string;
-      email: string;
-      github: string;
-      linkedin: string;
-    };
-    profileTitle: string;
-    profileStack: string;
-    tags: { freelance: string; response: string; fullStack: string };
-    note: string;
+    eyebrow: string;
+    title: string;
+    channelsTitle: string;
+    whatsappCta: string;
+    responseLabel: string;
+    responseValue: string;
+    otherChannels: string;
     formTitle: string;
   };
   contactForm: {
@@ -143,6 +227,12 @@ export type Dictionary = {
     submitIdle: string;
     submitSending: string;
     successMessage: string;
+    openWhatsapp: string;
     errorMessage: string;
+    // Falha ao registrar: alternativa explícita pelo WhatsApp, com os dados
+    // já preenchidos (o lead NÃO foi salvo).
+    errorWhatsappHint: string;
+    sendViaWhatsapp: string;
   };
+  commercial: CommercialCopy;
 };

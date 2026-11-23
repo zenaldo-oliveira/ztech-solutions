@@ -1,213 +1,303 @@
+import { commercialPt } from "@/lib/i18n/dictionaries/commercial/pt";
 import type { Dictionary } from "@/lib/i18n/types";
 
 export const pt: Dictionary = {
   nav: {
-    home: "Home",
-    about: "Sobre",
-    services: "Soluções",
-    projects: "Cases",
-    skills: "Habilidades",
-    certificates: "Certificados",
+    home: "Início",
+    about: "Sobre a MyCod",
+    services: "Sites e sistemas",
+    plans: "Planos e valores",
+    build: "Montar projeto",
+    howItWorks: "Como funciona",
+    projects: "Projetos reais",
     contact: "Contato",
   },
-  sidebar: {
+  brand: {
     tagline: "Tecnologia que impulsiona negócios",
-    availableForProjects: "Disponível para Projetos",
     description:
       "Sites profissionais, sistemas web, automações inteligentes e agentes de IA para empresas.",
   },
+  sidebar: {
+    navLabel: "Navegação principal",
+    footerNavLabel: "Institucional",
+    quoteCta: "Pedir orçamento",
+    collapse: "Recolher barra lateral",
+    expand: "Expandir barra lateral",
+  },
+  topbar: {
+    skipToContent: "Pular para o conteúdo",
+    openMenu: "Abrir menu",
+    closeMenu: "Fechar menu",
+    breadcrumbLabel: "Localização",
+  },
+  preferences: {
+    trigger: "Preferências",
+    language: "Idioma",
+    theme: "Tema",
+    themeLight: "Claro",
+    themeDark: "Escuro",
+    display: "Exibição",
+  },
+  footer: {
+    navTitle: "Navegação",
+    moreTitle: "Mais",
+    contactTitle: "Contato",
+    socialTitle: "Redes",
+    whatsapp: "WhatsApp",
+    rights: "Todos os direitos reservados.",
+  },
+  cta: {
+    talk: "Falar com a MyCod",
+    whatsappAriaLabel: "Falar com a MyCod pelo WhatsApp (abre em nova aba)",
+    whatsappHint: "pelo WhatsApp (abre em nova aba)",
+  },
   globalControls: {
-    themeToLight: "Ativar tema claro",
-    themeToDark: "Ativar tema escuro",
     languageSelector: "Selecionar idioma",
     languageMenuLabel: "Idiomas disponíveis",
   },
   home: {
     hero: {
-      badge: "ZTech Solutions — Desenvolvimento de Software",
-      titleLine: "Transformamos processos empresariais em",
-      headlineSequence: [
+      eyebrow: "Tecnologia para pequenas e médias empresas",
+
+      title: "Sites, sistemas e automações para empresas de serviços",
+
+      description:
+        "Criamos sites para apresentar seus serviços, sistemas para organizar sua rotina e automações com IA para agilizar o atendimento.",
+
+      ctaPrimary: "Solicitar proposta",
+      ctaSecondary: "Ver projetos reais",
+      ctaQuote: "Solicitar orçamento",
+      ctaWhatsApp: "Pedir orçamento pelo WhatsApp",
+      ctaConfigurator: "Montar projeto no configurador",
+      assurance: "Antes de contratar, você recebe uma proposta com escopo, prazo e valores definidos.",
+      showcase: {
+        caption: "Demonstração com dados fictícios",
+        tablistLabel: "Exemplos de demonstração",
+        tabs: { sites: "Sites", systems: "Sistemas", ai: "IA" },
+        sites: {
+          situation: "Um cliente pede orçamento pelo site",
+          formTitle: "Novo pedido de orçamento",
+          client: "Mariana Costa",
+          service: "Limpeza de ar-condicionado",
+          place: "Cuiabá · Centro",
+          channel: "Recebido pelo site",
+          labels: { name: "Nome", service: "Serviço", place: "Local" },
+          action: "Responder no WhatsApp",
+        },
+        systems: {
+          situation: "O pedido entra no painel da equipe",
+          columns: { new: "Novos", progress: "Em atendimento", done: "Concluídos" },
+          title: "Pedidos",
+          orders: [
+            { id: "#1038", client: "Oficina Exemplo", service: "Revisão do sistema" },
+            { id: "#1041", client: "Carlos Lima", service: "Manutenção preventiva" },
+          ],
+          incoming: { id: "#1042", client: "Mariana Costa", service: "Limpeza de ar-condicionado" },
+          tag: "Entrou agora",
+        },
+        ai: {
+          situation: "A automação atende a conversa e registra o pedido",
+          client: "Mariana Costa",
+          question: "Vocês fazem limpeza de ar-condicionado? Quanto custa?",
+          answer: "Fazemos sim! Quantos aparelhos são? Vou registrar seu pedido e a equipe confirma o valor.",
+          tag: "Pedido registrado no painel",
+          botName: "Automação MyCod",
+        },
+      },
+      services: [
+        { name: "Sites", benefit: "Páginas para apresentar seus serviços e receber pedidos." },
+        { name: "Sistemas sob medida", benefit: "Organize pedidos, agenda e cadastros em um lugar só." },
+        { name: "Automações com IA", benefit: "Respostas e pedidos organizados sem trabalho manual." },
+      ],
+      chat: {
+        header: "MyCod",
+        outgoing: "Olá! Vim pelo site da MyCod e gostaria de pedir um orçamento para o meu negócio. Pode me ajudar?",
+        outgoingMeta: "mensagem preenchida",
+        reply: "Olá! Obrigado por entrar em contato. Me conte qual serviço você precisa.",
+      },
+
+      mockup: {
+        caption: "Interface conceitual · ZLift Manager",
+        modules: [
+          "Clientes",
+          "Elevadores",
+          "Técnicos",
+          "Ordens de serviço",
+          "Checklist",
+          "Relatórios",
+        ],
+        ordersTitle: "Ordens de serviço",
+        newOrder: "Nova ordem",
+        checklistTitle: "Checklist de execução",
+        checklistItems: ["Fotos", "Observações", "Assinatura", "Relatório"],
+        reportTitle: "Relatório",
+      },
+    },
+
+    // Mantenha as outras propriedades de home aqui.
+    capabilities: {
+      items: [
         "Sistemas Web",
-        "Sistemas Empresariais",
-        "Plataformas SaaS",
-        "Soluções com IA",
-      ],
-      description:
-        "Desenvolvemos sistemas web, SaaS, automações e soluções com inteligência artificial para empresas que querem ganhar produtividade, controle e escala.",
-      ctaPrimary: "Falar com a ZTech",
-      ctaSecondary: "Ver projetos",
-    },
-    problems: {
-      title: "Sua empresa ainda depende de processos manuais?",
-      items: [
-        "Planilhas espalhadas",
-        "Processos manuais",
-        "Informações descentralizadas",
-        "Excesso de tarefas repetitivas",
-        "Sistemas que não conversam entre si",
-        "Dificuldade para acompanhar operações",
-        "Falta de indicadores",
-        "Atendimento manual",
-      ],
-      quote: "A tecnologia deve simplificar a operação, não complicá-la.",
-      cta: "Quero melhorar meu processo",
-    },
-    solutions: {
-      title: "Soluções",
-      description:
-        "Sistemas empresariais, SaaS, inteligência artificial, automação, sistemas web e integrações.",
-      items: [
-        "Sistemas Empresariais",
         "SaaS",
+        "Aplicativos",
         "Inteligência Artificial",
         "Automação",
-        "Sistemas Web",
         "Integrações",
       ],
-      viewAll: "Ver todos os serviços",
+    },
+    solutions: {
+      flow: ["Entrada", "IA", "Automação", "Resultado"],
+    },
+    product: {
+      tagline: "Plataforma para gestão de operações de manutenção.",
+      flow: [
+        "Clientes",
+        "Elevadores",
+        "Técnicos",
+        "Ordens de serviço",
+        "Execução",
+        "Checklist",
+        "Fotos",
+        "Observações",
+        "Assinatura",
+        "Relatório",
+      ],
     },
     cases: {
-      title: "Cases",
+      eyebrow: "Projetos reais",
+      title: "Projetos que construímos",
       description:
         "Exemplos reais do que já desenvolvemos — o problema, a solução e a tecnologia por trás de cada um.",
-      items: [
-        {
-          category: "Plataforma / SaaS",
-          description:
-            "Plataforma própria que centraliza a operação de empresas de manutenção de elevadores: clientes, técnicos, ordens de serviço e relatórios.",
-          status: "Produto próprio",
-        },
-        {
-          category: "Aplicativo Mobile",
-          description:
-            "App mobile com Inteligência Artificial (Gemini AI) que gera dietas personalizadas a partir dos dados do usuário.",
-          status: "🏆 Projeto Principal",
-        },
-        {
-          category: "Site Institucional",
-          description:
-            "Site profissional com integração direta ao WhatsApp para captação de clientes.",
-          status: "🌐 Online",
-        },
-      ],
-      viewAll: "Ver todos os cases",
+      explore: "Explorar",
+      similar: "Quero algo parecido",
     },
     howWeWork: {
-      title: "Como trabalhamos",
-      steps: [
-        "Entendemos o problema",
-        "Mapeamos o processo",
-        "Definimos a solução",
-        "Desenvolvemos",
-        "Testamos",
-        "Colocamos em produção",
-        "Evoluímos",
-      ],
-    },
-    ai: {
-      title: "Inteligência artificial aplicada ao negócio.",
-      description:
-        "Utilizamos IA para atendimento, qualificação de leads, automação, análise, suporte e produtividade — reduzindo o trabalho manual repetitivo da operação.",
-      useCases: [
-        "Atendimento",
-        "Qualificação de leads",
-        "Automação",
-        "Análise",
-        "Suporte",
-        "Produtividade",
-      ],
-    },
-    technologies: {
-      title: "Tecnologias",
+      eyebrow: "Como trabalhamos",
+      title: "Do problema ao software",
     },
     finalCta: {
-      title: "Tem um processo que poderia ser melhor?",
+      title: "Tem um processo que pode ser melhor?",
+      subtitle: "Vamos transformar sua ideia em software.",
       description:
         "Conte como sua empresa trabalha hoje. Vamos entender o problema e avaliar como a tecnologia pode transformar esse processo.",
-      cta: "Falar com a ZTech",
+      cta: "Falar com a MyCod",
+      secondary: "Prefere formulário? Enviar mensagem",
     },
   },
   about: {
-    badge: "🚀 Sobre a ZTech Solutions",
-    title: "Software desenvolvido para resolver problemas reais.",
+    eyebrow: "Sobre a MyCod",
+    title: "Tecnologia para transformar problemas reais em soluções digitais.",
     description:
-      "A ZTech Solutions desenvolve soluções digitais personalizadas — sistemas web, SaaS, automações e agentes de inteligência artificial — para empresas que querem digitalizar processos e ganhar eficiência.",
-    founderTitle: "👨‍💻 Quem está por trás",
-    founderBody:
-      "A ZTech Solutions é fundada por Zenaldo Oliveira, Desenvolvedor Full Stack formado em Análise e Desenvolvimento de Sistemas, construindo aplicações modernas com React, Next.js, TypeScript, Prisma e PostgreSQL. Além da área de desenvolvimento, possui formação técnica em Eletrotécnica e conhecimentos em Investigação Digital (OSINT) — uma combinação que fortalece a resolução de problemas e o pensamento analítico por trás de cada solução entregue.",
-    formationTitle: "Formação",
-    formationItems: [
-      "🎓 Análise e Desenvolvimento de Sistemas",
-      "📚 React e Next.js",
-    ],
-    interestsTitle: "Áreas de Interesse",
-    interests: [
-      "💻 Desenvolvimento Web",
-      "🤖 Inteligência Artificial",
-      "⚡ Automações",
-      "🔍 OSINT",
-    ],
-  },
-  services: {
-    badge: "Serviços",
-    headlineSequence: [
-      "Desenvolvendo Soluções Digitais",
-      "Aplicações Full Stack",
-      "Projetos SaaS",
-      "IA e Automações",
-    ],
-    description:
-      "Desenvolvimento de sistemas empresariais, SaaS, automações e soluções com inteligência artificial, usando React, Next.js, TypeScript, Prisma e PostgreSQL.",
-    items: [
-      {
-        title: "Sistemas Empresariais",
-        description:
-          "Sistemas sob medida para gestão, operação, clientes e processos — no lugar de planilhas soltas e controle manual.",
+      "A MyCod desenvolve sistemas web, SaaS, aplicativos, automações e soluções com inteligência artificial para empresas que querem digitalizar processos e ganhar mais controle sobre suas operações.",
+    cta: "Falar com a MyCod",
+    secondaryCta: "Explorar cases",
+    capabilitiesTitle: "O que desenvolvemos",
+    culture: {
+      eyebrow: "Cultura",
+      title: "Como a MyCod pensa e trabalha.",
+      description: "Propósito, missão e visão que orientam cada projeto, e os valores com exemplos de como os aplicamos no dia a dia.",
+      purposeLabel: "Propósito",
+      purpose: "Ajudar empresas de serviços a serem encontradas, atenderem melhor e ganharem tempo com tecnologia.",
+      missionLabel: "Missão",
+      mission: "Criar sites, sistemas e automações que resolvam problemas concretos, como facilitar pedidos de orçamento, organizar agendamentos e reduzir tarefas repetitivas.",
+      visionLabel: "Visão",
+      vision: "Construir a reputação da MyCod em Cuiabá e Várzea Grande pela qualidade das entregas, pela clareza nas propostas e pela confiança dos clientes.",
+      valuesTitle: "Valores e como praticamos",
+      howLabel: "Como praticamos",
+      values: [
+        {
+          name: "Entender antes de construir",
+          how: "Descobrimos como a empresa trabalha e onde perde tempo ou oportunidades.",
+        },
+        {
+          name: "Clareza nos combinados",
+          how: "Registramos escopo, prazo, investimento e o que está incluído após a entrega. Conversamos antes de alterar o combinado.",
+        },
+        {
+          name: "Simplicidade para quem usa",
+          how: "Priorizamos jornadas diretas, como pedir orçamento pelo WhatsApp no celular.",
+        },
+        {
+          name: "Qualidade na entrega",
+          how: "Testamos o caminho completo do cliente e demonstramos o resultado na entrega.",
+        },
+        {
+          name: "Cuidado com o negócio do cliente",
+          how: "Protegemos acessos, pedimos autorização para divulgar projetos e orientamos o cliente sobre o uso da solução.",
+        },
+      ],
+      openingLabel: "Como começamos cada projeto",
+      opening: "“O que precisa ficar mais fácil no seu negócio depois que esse projeto estiver no ar?”",
+      toneLabel: "Tom de voz",
+      tone: "Direto, profissional e próximo. Descrevemos o que o cliente poderá fazer com a solução e combinamos o que será entregue.",
+    },
+    proof: {
+      eyebrow: "Prova",
+      title: "O que já construímos",
+      othersLabel: "Outros projetos",
+      cta: "Explorar cases",
+    },
+    founder: {
+      eyebrow: "Fundador",
+      title: "Quem está por trás da MyCod",
+      role: "Fundador da MyCod",
+      body: [
+        "A MyCod é fundada por Zenaldo Pereira de Oliveira, desenvolvedor full stack formado em Análise e Desenvolvimento de Sistemas, que constrói aplicações modernas com React, Next.js, TypeScript, Prisma e PostgreSQL.",
+        "Além do desenvolvimento, possui formação técnica em Eletrotécnica e conhecimentos em Investigação Digital (OSINT) — uma combinação que fortalece a resolução de problemas e o pensamento analítico por trás de cada solução entregue.",
+      ],
+      formationTitle: "Formação",
+      formationItems: [
+        "Análise e Desenvolvimento de Sistemas",
+        "Formação técnica em Eletrotécnica",
+        "React e Next.js",
+      ],
+    },
+    tech: {
+      eyebrow: "Capacidade técnica",
+      title: "As tecnologias com que construímos.",
+      description:
+        "As tecnologias que usamos nas entregas, com os projetos reais em que cada uma já foi aplicada.",
+      groups: {
+        web: "Web",
+        mobile: "Mobile",
+        backend: "Backend",
+        data: "Dados",
+        ai: "Inteligência artificial",
+        automation: "Automação",
       },
-      {
-        title: "SaaS",
-        description:
-          "Transformamos uma solução em produto: plataforma escalável, pronta para atender vários clientes.",
-      },
-      {
-        title: "Inteligência Artificial",
-        description:
-          "IA aplicada a atendimento, qualificação de leads e suporte, reduzindo trabalho manual repetitivo.",
-      },
-      {
-        title: "Automação",
-        description:
-          "Processos repetitivos automatizados entre sistemas, WhatsApp e ferramentas do dia a dia da empresa.",
-      },
-      {
-        title: "Sistemas Web",
-        description:
-          "Aplicações modernas e responsivas, desenvolvidas de acordo com a necessidade real do negócio.",
-      },
-      {
-        title: "Integrações",
-        description:
-          "Conectamos APIs, bancos de dados e serviços para eliminar retrabalho entre sistemas que não conversam entre si.",
-      },
-    ],
-    ctaTitle: "Vamos transformar sua ideia em realidade?",
-    ctaContact: "Entrar em Contato",
-    ctaProjects: "Ver Projetos",
+      appliedIn: "Aplicado em",
+    },
+    finalCta: {
+      title: "Tem um processo que pode ser melhor?",
+      subtitle: "Conte para a MyCod o que sua empresa precisa.",
+    },
   },
   projects: {
     badge: "Cases e Projetos",
-    headlineSequence: [
-      "Sistemas para Empresas",
-      "Sites Profissionais",
-      "Automações Inteligentes",
-      "Aplicações Full Stack",
-    ],
+    filterLabel: "Filtrar por categoria",
+    filterAll: "Todos",
+    allTitle: "Todos os projetos",
     description:
       "Cada case abaixo mostra o problema real e a solução entregue — desenvolvidos com React, Next.js, React Native, Inteligência Artificial e soluções escaláveis para empresas.",
     problemLabel: "Problema",
     solutionLabel: "Solução",
     demoLabel: "Demo",
+    demonstrationBadge: "Demonstração",
     githubLabel: "GitHub",
+    media: {
+      screenshotAlt: "Página inicial publicada do {title}",
+      phoneAlts: [
+        "Tela inicial do aplicativo {title}",
+        "Dieta gerada pelo aplicativo {title}",
+      ],
+    },
+    carousel: {
+      region: "Projetos",
+      previous: "Projeto anterior",
+      next: "Próximo projeto",
+      goTo: "Ir para o projeto",
+      of: "de",
+    },
     items: [
       {
         category: "Plataforma / SaaS",
@@ -223,7 +313,7 @@ export const pt: Dictionary = {
           "Montar uma dieta personalizada normalmente depende de acompanhamento manual, sem cruzar automaticamente todos os dados do usuário.",
         solution:
           "Aplicativo mobile Full Stack com Inteligência Artificial (Gemini AI) que gera dietas personalizadas a partir de peso, altura, idade, objetivo e nível de atividade física.",
-        status: "🏆 Projeto Principal",
+        status: "Projeto Principal",
       },
       {
         category: "Site Institucional",
@@ -231,7 +321,7 @@ export const pt: Dictionary = {
           "Pet shops locais sem presença digital profissional perdem clientes para concorrentes com site e canal de contato direto.",
         solution:
           "Website profissional com design moderno, responsivo e integração direta com WhatsApp para captação de clientes.",
-        status: "🌐 Online",
+        status: "Online",
       },
       {
         category: "Site Institucional",
@@ -239,7 +329,7 @@ export const pt: Dictionary = {
           "Barbearias que dependem só de indicação ou redes sociais têm dificuldade para converter interesse em agendamento.",
         solution:
           "Site profissional com design responsivo, integração com WhatsApp e foco em geração de agendamentos.",
-        status: "🌐 Online",
+        status: "Online",
       },
       {
         category: "Ferramenta Web",
@@ -247,7 +337,7 @@ export const pt: Dictionary = {
           "Conteúdo em texto nem sempre é acessível para todos os usuários ou contextos de uso.",
         solution:
           "Aplicação web que converte texto em áudio usando síntese de voz via Web Speech API, sem depender de serviços pagos de terceiros.",
-        status: "🌐 Online",
+        status: "Online",
       },
       {
         category: "Aplicativo Mobile",
@@ -257,106 +347,30 @@ export const pt: Dictionary = {
           "Aplicativo mobile integrado a um backend próprio para centralizar a gestão automotiva.",
         status: "Em Desenvolvimento",
       },
-    ],
-  },
-  skills: {
-    badge: "Tecnologias & Soluções",
-    headlineSequence: [
-      "Sites que Vendem",
-      "Sistemas para Empresas",
-      "Agentes de IA",
-      "Automação de Processos",
-      "Tecnologia para Negócios",
-    ],
-    description:
-      "Desenvolvimento Full Stack, Inteligência Artificial e automações para criar soluções modernas, escaláveis e focadas em resultados.",
-    categories: [
-      { title: "Frontend" },
-      { title: "Backend" },
-      { title: "IA & Automação" },
-      { title: "Ferramentas" },
-    ],
-    stats: [
-      { value: "15+", label: "Tecnologias" },
-      { value: "Full Stack", label: "Frontend & Backend" },
-      { value: "IA", label: "Automações Inteligentes" },
-    ],
-  },
-  certificates: {
-    badge: "Certificados",
-    headlineSequence: [
-      "Formação e Certificações",
-      "Aprendizado Contínuo",
-      "Evoluindo na Tecnologia",
-      "Construindo Conhecimento",
-    ],
-    description:
-      "Minha jornada de aprendizado através da graduação, especializações e certificações na área de tecnologia.",
-    formationTitle: "Formação Acadêmica",
-    formationDescription: "Graduado em Análise e Desenvolvimento de Sistemas.",
-    coursesTitle: "Certificados e Cursos",
-    items: [
+
       {
-        title: "Análise e Desenvolvimento de Sistemas",
-        institution: "Graduação",
-        status: "Concluído",
+        category: "Site",
+        problem: "Apresentação digital de uma cafeteria.",
+        solution: "Confira a captura do projeto Cafeteria.",
+        status: "Projeto",
       },
       {
-        title: "Formação Full Stack",
-        institution: "Especialização",
-        status: "Em andamento",
+        category: "Site",
+        problem: "Apresentação digital de um negócio de turismo.",
+        solution: "Confira a captura do projeto Turismo.",
+        status: "Projeto",
       },
-      { title: "React", institution: "Certificação", status: "Em breve" },
-      { title: "Next.js", institution: "Certificação", status: "Em breve" },
-      {
-        title: "TypeScript",
-        institution: "Certificação",
-        status: "Em breve",
-      },
-      {
-        title: "IA & Automação",
-        institution: "Certificação",
-        status: "Em breve",
-      },
-    ],
-    studyingTitle: "🚀 Atualmente Estudando",
-    studyingItems: [
-      "React Native",
-      "Next.js",
-      "Prisma",
-      "PostgreSQL",
-      "IA",
-      "Agentes IA",
-      "WhatsApp Automation",
-      "OSINT",
-      "Docker",
     ],
   },
   contact: {
-    badge: "Entre em Contato",
-    headlineSequence: [
-      "Vamos criar algo incrível?",
-      "Soluções Full Stack",
-      "Apps modernas e rápidas",
-      "React • Next.js • Node.js",
-    ],
-    description:
-      "Estou disponível para freelas, desenvolvimento de sistemas, landing pages, dashboards, integrações com APIs e projetos Full Stack.",
-    quickLinks: {
-      whatsapp: "WhatsApp",
-      email: "E-mail",
-      github: "GitHub",
-      linkedin: "LinkedIn",
-    },
-    profileTitle: "Desenvolvedor Full Stack",
-    profileStack: "React • Next.js • Node.js • TypeScript",
-    tags: {
-      freelance: "🚀 Freelas",
-      response: "⚡ Até 24h",
-      fullStack: "💻 Full Stack",
-    },
-    note: "🚀 Sempre buscando criar produtos digitais de alta qualidade.",
-    formTitle: "Enviar Mensagem",
+    eyebrow: "Contato",
+    title: "Vamos conversar sobre seu projeto.",
+    channelsTitle: "Fale direto com a MyCod",
+    whatsappCta: "Falar com a MyCod",
+    responseLabel: "Tempo de resposta",
+    responseValue: "Até 24h",
+    otherChannels: "Outros canais",
+    formTitle: "Enviar mensagem",
   },
   contactForm: {
     namePlaceholder: "Seu nome",
@@ -365,8 +379,14 @@ export const pt: Dictionary = {
     messagePlaceholder: "Descreva seu projeto...",
     submitIdle: "Enviar para WhatsApp",
     submitSending: "Enviando...",
-    successMessage: "Contato registrado! Abrindo o WhatsApp...",
+    successMessage:
+      "Contato registrado! Se o WhatsApp não abrir automaticamente, toque no botão abaixo.",
+    openWhatsapp: "Abrir conversa no WhatsApp",
     errorMessage:
       "Não foi possível registrar seu contato agora. Tente novamente em instantes.",
+    errorWhatsappHint:
+      "Seus dados continuam no formulário. Se preferir, envie a mesma mensagem direto pelo WhatsApp:",
+    sendViaWhatsapp: "Enviar pelo WhatsApp",
   },
+  commercial: commercialPt,
 };

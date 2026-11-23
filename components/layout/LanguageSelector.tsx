@@ -8,7 +8,7 @@ import type { LanguageCode } from "@/lib/i18n/types";
 
 // Nomes de cada idioma sempre no próprio idioma (convenção padrão de
 // seletores de idioma) — não vêm do dicionário, não mudam com a seleção.
-const LANGUAGES: { code: LanguageCode; label: string; flag: string }[] = [
+export const LANGUAGES: { code: LanguageCode; label: string; flag: string }[] = [
   { code: "pt", label: "Português", flag: "🇧🇷" },
   { code: "en", label: "English", flag: "🇺🇸" },
   { code: "es", label: "Español", flag: "🇪🇸" },
@@ -67,8 +67,8 @@ export function LanguageSelector() {
           rounded-xl border border-border bg-surface backdrop-blur-xl
           text-accent
           transition-colors duration-300
-          hover:border-cyan-500/40 hover:bg-cyan-500/10
-          focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/60
+          hover:border-violet-400/40 hover:bg-violet-400/10
+          focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400/60
         "
       >
         <Globe size={18} />
@@ -108,11 +108,11 @@ export function LanguageSelector() {
                   className={`
                     flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm
                     transition-colors duration-200
-                    focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/60
+                    focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400/60
                     ${
                       isSelected
-                        ? "bg-cyan-500/10 text-accent"
-                        : "text-text-secondary hover:bg-cyan-500/5 hover:text-text-primary"
+                        ? "bg-violet-400/10 text-accent"
+                        : "text-text-secondary hover:bg-violet-400/5 hover:text-text-primary"
                     }
                   `}
                 >

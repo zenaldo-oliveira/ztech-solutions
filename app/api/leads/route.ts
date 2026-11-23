@@ -1,4 +1,4 @@
-import { supabase } from "@/components/lib/supabase";
+import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { getNotificationService } from "@/lib/notifications/getNotificationService";
 import {
   buildLeadNotificationMessage,
@@ -19,9 +19,8 @@ const MAX_FIELD_LENGTH = 200;
 // prefixado com NEXT_PUBLIC_, nunca enviado ao client.
 const NOTIFICATION_RECIPIENT = process.env.LEAD_NOTIFICATION_WHATSAPP ?? "";
 
-// Rate limit próprio desta rota (mesmo padrão em memória do /api/chat, mas
-// separado — /api/leads é pública e é chamada bem menos vezes por sessão que
-// o chat, então o limite é mais apertado).
+// Rate limit em memória, por instância: /api/leads é pública e um visitante
+// a chama poucas vezes por sessão, então o limite é apertado.
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_MAX_REQUESTS = 5;
 const requestTimestamps = new Map<string, number[]>();
@@ -100,7 +99,7 @@ async function notifyLead(message: string, dedupeKey: string) {
 // Verifica se já existe um lead salvo para este WhatsApp normalizado — evita
 // linhas duplicadas no Supabase quando o mesmo visitante volta à conversa.
 async function findExistingLeadByWhatsapp(whatsapp: string) {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabaseServerClient()
     .from("leads")
     .select("id")
     .eq("whatsapp", whatsapp)
@@ -133,13 +132,13 @@ async function handleLegacyContactLead(body: Record<string, unknown>) {
   const segmento = optionalString(body.segmento);
   const necessidade = optionalString(body.necessidade);
 
-  const { error } = await supabase.from("leads").insert([
+  const { error } = await getSupabaseServerClient().from("leads").insert([
     { nome, whatsapp, interesse },
   ]);
 
   if (error) {
     console.error("Erro ao salvar lead no Supabase:", error);
-    return Response.json({ error: error.message }, { status: 500 });
+    return Response.json({ error: "Erro ao salvar lead" }, { status: 500 });
   }
 
   const message = buildLeadNotificationMessage({
@@ -157,7 +156,7 @@ async function handleLegacyContactLead(body: Record<string, unknown>) {
   return Response.json({ success: true });
 }
 
-// ===== Caminho novo: lead qualificado pelo ZTech AI =====
+// ===== Caminho novo: lead qualificado pelo MyCod AI =====
 async function handleAiQualifiedLead(body: Record<string, unknown>) {
   if (!isNonEmptyString(body.name) || !isNonEmptyString(body.whatsapp)) {
     return Response.json({ error: "Dados inválidos" }, { status: 400 });
@@ -204,13 +203,13 @@ async function handleAiQualifiedLead(body: Record<string, unknown>) {
   const existing = await findExistingLeadByWhatsapp(whatsapp);
 
   if (!existing) {
-    const { error } = await supabase.from("leads").insert([
+    const { error } = await getSupabaseServerClient().from("leads").insert([
       { nome: name, whatsapp, interesse: interest ?? "" },
     ]);
 
     if (error) {
       console.error("Erro ao salvar lead qualificado no Supabase:", error);
-      return Response.json({ error: error.message }, { status: 500 });
+      return Response.json({ error: "Erro ao salvar lead" }, { status: 500 });
     }
   }
 
@@ -229,7 +228,7 @@ async function handleAiQualifiedLead(body: Record<string, unknown>) {
     budget,
     score,
     status,
-    origin: "Portfólio — ZTech AI",
+    origin: "Portfólio — MyCod AI",
     leadId: existing?.id,
   };
 
